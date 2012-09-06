@@ -53,12 +53,16 @@ snippet ifndef "Ifndef Directive"
 -ifndef(${1:macro}).
 endsnippet
 
-snippet imp "Import Directive"
+snippet imp "Import Directive" b
 -import(${1:module}, [${2:function}/${3:arity}]).
 endsnippet
 
-snippet inc "Include Directive"
+snippet inc "Include Directive" b
 -include("${1:file}").
+endsnippet
+
+snippet incl "Include Lib Directive" b
+-include_lib("${1:file}").
 endsnippet
 
 snippet mod "Module Directive"
@@ -93,6 +97,377 @@ endsnippet
 
 snippet undef "Undef Directive"
 -undef(${1:macro}).
+endsnippet
+
+snippet keyfind "lists:keyfind call"
+lists:keyfind(${1:Key}, ${2:1}, ${3:List})
+endsnippet
+
+snippet lkf "lists:keyfind call" b
+{$1, ${4:Val}} = lists:keyfind(${1:Key}, ${2:1}, ${3:List}),
+endsnippet
+
+snippet map "lists:map loop"
+lists:map(fun(${2:Arg}) ->
+    ${3:ok}
+end, ${1:List}),
+endsnippet
+
+snippet flatmap "lists:flatmap loop"
+lists:flatmap(fun(${2:Arg}) ->
+    ${3:ok}
+end, ${1:List}),
+endsnippet
+
+snippet foreach "lists:foreach loop"
+lists:foreach(fun(${2:Arg}) ->
+    ${3:ok}
+end, ${1:List})
+endsnippet
+
+snippet foldl "lists:foldl"
+lists:foldl(fun(${3:Arg}, ${4:Acc}) ->
+    ${5:ok}
+end, ${2:Acc0}, ${1:List})
+endsnippet
+
+snippet foldr "lists:foldr"
+lists:foldr(fun(${3:Arg}, ${4:Acc}) ->
+    ${5:ok}
+end, ${2:Acc0}, ${1:List})
+endsnippet
+
+snippet seq "lists:seq"
+lists:seq(${2:1}, ${1:N})
+endsnippet
+
+snippet sleep "timer:sleep"
+timer:sleep(${1})
+endsnippet
+
+snippet a2l "atom_to_list"
+atom_to_list(${1})
+endsnippet
+
+snippet a2b "atom_to_binary"
+list_to_binary(atom_to_list(${1}))
+endsnippet
+
+# ugly, but common in exmpp removal
+snippet l2ea "list_to_existing_atom"
+list_to_existing_atom(${1})
+endsnippet
+
+snippet l2b "list_to_binary"
+list_to_binary(${1})
+endsnippet
+
+snippet b2l "binary_to_list"
+binary_to_list(${1})
+endsnippet
+
+snippet dbg "dbg:tracer" b
+dbg:tracer(),
+dbg:p(all, call),
+dbg:tpl(${1:?MODULE}, ${2:${3:fun}, x}),
+endsnippet
+
+snippet spec "spec" b
+-spec ${1:function}(${2:args}) -> ${3:result}.
+endsnippet
+
+###########################################################################
+## OTP
+###########################################################################
+
+snippet gen_server "OTP gen_server" b
+-behaviour(gen_server).
+
+%% API
+-export([start_link/0]).
+
+%% gen_server callbacks
+-export([init/1,
+         handle_call/3,
+         handle_cast/2,
+         handle_info/2,
+         terminate/2,
+         code_change/3]).
+
+-define(SERVER, ?MODULE).
+
+-record(state, {}).
+
+%%%===================================================================
+%%% API
+%%%===================================================================
+
+start_link() ->
+    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+
+%%%===================================================================
+%%% gen_server callbacks
+%%%===================================================================
+
+init([]) ->
+    {ok, #state{}}.
+
+handle_call(_Request, _From, State) ->
+    Reply = unimplemented,
+    {stop, unimplemented, Reply, State}.
+    %% {reply, Reply, State}.
+
+handle_cast(_Msg, State) ->
+    {stop, unimplemented, State}.
+    %% {noreply, State}.
+
+handle_info(_Info, State) ->
+    {noreply, State}.
+
+terminate(_Reason, _State) ->
+    ok.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
+endsnippet
+
+snippet gen_fsm "OTP gen_fsm" b
+-behaviour(gen_fsm).
+
+%% API
+-export([start_link/0]).
+
+%% gen_fsm callbacks
+-export([init/1,
+         state_name/2,
+         state_name/3,
+         handle_event/3,
+         handle_sync_event/4,
+         handle_info/3,
+         terminate/3,
+         code_change/4]).
+
+-define(SERVER, ?MODULE).
+
+-record(state, {}).
+
+%%%===================================================================
+%%% API
+%%%===================================================================
+
+start_link() ->
+    gen_fsm:start_link({local, ?SERVER}, ?MODULE, [], []).
+
+%%%===================================================================
+%%% gen_fsm callbacks
+%%%===================================================================
+
+init([]) ->
+    {ok, state_name, #state{}}.
+
+state_name(_Event, State) ->
+    {next_state, state_name, State}.
+
+state_name(_Event, _From, State) ->
+    Reply = ok,
+    {reply, Reply, state_name, State}.
+
+handle_event(_Event, StateName, State) ->
+    {next_state, StateName, State}.
+
+handle_sync_event(_Event, _From, StateName, State) ->
+    Reply = ok,
+    {reply, Reply, StateName, State}.
+
+handle_info(_Info, StateName, State) ->
+    {next_state, StateName, State}.
+
+terminate(_Reason, _StateName, _State) ->
+    ok.
+
+code_change(_OldVsn, StateName, State, _Extra) ->
+    {ok, StateName, State}.
+endsnippet
+
+
+snippet application "OTP application" b
+-behaviour(application).
+
+%% Application callbacks
+-export([start/2,
+         stop/1]).
+
+%%%===================================================================
+%%% Application callbacks
+%%%===================================================================
+
+start(_StartType, _StartArgs) ->
+    case 'TopSupervisor':start_link() of
+        {ok, Pid} ->
+            {ok, Pid};
+        Error ->
+            Error
+                end.
+
+stop(_State) ->
+    ok.
+endsnippet
+
+
+snippet supervisor "OTP supervisor" b
+-behaviour(supervisor).
+
+%% API
+-export([start_link/0]).
+
+%% Supervisor callbacks
+-export([init/1]).
+
+-define(SERVER, ?MODULE).
+
+%%%===================================================================
+%%% API functions
+%%%===================================================================
+
+start_link() ->
+    supervisor:start_link({local, ?SERVER}, ?MODULE, []).
+
+%%%===================================================================
+%%% Supervisor callbacks
+%%%===================================================================
+
+init([]) ->
+    RestartStrategy = one_for_one,
+    MaxRestarts = 1000,
+    MaxSecondsBetweenRestarts = 3600,
+
+    SupFlags = {RestartStrategy, MaxRestarts, MaxSecondsBetweenRestarts},
+
+    Restart = permanent,
+    Shutdown = 2000,
+    Type = worker,
+
+    AChild = {'AName', {'AModule', start_link, []},
+              Restart, Shutdown, Type, ['AModule']},
+
+    {ok, {SupFlags, [AChild]}}.
+endsnippet
+
+snippet %%- "comment box" b
+%%--------------------------------------------------------------------
+%% ${1}
+%%--------------------------------------------------------------------
+
+endsnippet
+
+snippet %%%= "strong comment box" b
+%%%===================================================================
+%%% ${1}
+%%%===================================================================
+
+endsnippet
+
+###########################################################################
+## ESL / ejd
+###########################################################################
+
+snippet fmt "io:format" b
+io:format("${1}", [${2}]),
+endsnippet
+
+snippet log "log something" b
+error_logger:info_msg("${1}", [${2}]),
+endsnippet
+
+snippet eslhdr "ESL copyright header" b
+%%%===================================================================
+%%% @copyright (C) 2012, Erlang Solutions Ltd.
+%%% @doc ${1}
+%%% @end
+%%%===================================================================
+
+endsnippet
+
+# escalus - related snippets
+
+snippet oovoo_escalus "Common Test and Escalus based suite for ooVoo" b
+-compile(export_all).
+
+-include_lib("escalus/include/escalus.hrl").
+-include_lib("common_test/include/ct.hrl").
+
+%%%===================================================================
+%%% Suite configuration
+%%%===================================================================
+
+all() ->
+    [{group, ${1:group_name}}].
+
+groups() ->
+    [{$1, [sequence], [${2:test_name}]}].
+
+suite() ->
+    escalus:suite().
+
+%%%===================================================================
+%%% Init & teardown
+%%%===================================================================
+
+init_per_suite(Config0) ->
+    Config1 = escalus:init_per_suite(Config0),
+    oovoo_ct:create_users(Config1).
+
+end_per_suite(Config) ->
+    oovoo_ct:delete_users(Config),
+    escalus:end_per_suite(Config).
+
+init_per_group(_GroupName, Config) ->
+    Config.
+
+end_per_group(_GroupName, _Config) ->
+    ok.
+
+init_per_testcase(CaseName, Config) ->
+    escalus:init_per_testcase(CaseName, Config).
+
+end_per_testcase(CaseName, Config) ->
+    escalus:end_per_testcase(CaseName, Config).
+
+%%%===================================================================
+%%% ${3} tests
+%%%===================================================================
+
+$2(Config) ->
+    escalus:story(Config, [1, 1], fun(Alice, Bob) ->
+        ${4:%% story goes here
+        exit(unimplemented)}
+    end).
+
+endsnippet
+
+snippet story "Escalus story" b
+escalus:story(Config, [${1:1, 1}], fun(${2:Alice, Bob}) ->
+    %% ${3:Comment}
+    ${4:ok}
+end).
+endsnippet
+
+snippet ass "escalus:assert"
+escalus:assert(${1}, ${2})
+endsnippet
+
+snippet euls "escalus_utils:log_stanzas" b
+escalus_utils:log_stanzas("${1:description}", ${2:Stanzas}),
+endsnippet
+
+# ejabberd - related
+
+snippet err "error message" b
+?ERROR_MSG("${1}", [${2}]),
+endsnippet
+
+snippet info "info message" b
+?INFO_MSG("${1}", [${2}]),
 endsnippet
 
 # vim:ft=snippets:
