@@ -99,8 +99,21 @@ snippet undef "Undef Directive"
 -undef(${1:macro}).
 endsnippet
 
+snippet rev "lists:reverse"
+lists:reverse(${1:Acc})
+endsnippet
+
 snippet keyfind "lists:keyfind call"
 lists:keyfind(${1:Key}, ${2:1}, ${3:List})
+endsnippet
+
+snippet clkf "case lists:keyfind(...) of" b
+case lists:keyfind(${1:Key}, ${2:1}, ${3:List}) of
+    {$1, ${4:Val}} ->
+        ${5:found};
+    false ->
+        ${6:not_found}
+end
 endsnippet
 
 snippet lkf "lists:keyfind call" b
