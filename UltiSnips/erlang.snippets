@@ -27,9 +27,8 @@ snippet exp "Export Directive"
 endsnippet
 
 snippet fun "Fun Expression"
-fun
-	(${1:pattern})${2: when ${3:guard}} ->
-		${4:body}
+fun(${1:pattern})${2: when ${3:guard}} ->
+    ${4:body}
 end
 endsnippet
 
@@ -40,8 +39,8 @@ endsnippet
 
 snippet if "If Expression"
 if
-	${1:guard} ->
-		${2:body}
+    ${1:guard} ->
+        ${2:body}
 end
 endsnippet
 
@@ -122,8 +121,8 @@ endsnippet
 
 snippet map "lists:map loop"
 lists:map(fun(${2:Arg}) ->
-    ${3:ok}
-end, ${1:List}),
+              ${3:ok}
+          end, ${1:List}),
 endsnippet
 
 snippet flatmap "lists:flatmap loop"
@@ -134,20 +133,20 @@ endsnippet
 
 snippet foreach "lists:foreach loop"
 lists:foreach(fun(${2:Arg}) ->
-    ${3:ok}
-end, ${1:List})
+                  ${3:ok}
+              end, ${1:List})
 endsnippet
 
 snippet foldl "lists:foldl"
 lists:foldl(fun(${3:Arg}, ${4:Acc}) ->
-    ${5:ok}
-end, ${2:Acc0}, ${1:List})
+                ${5:ok}
+            end, ${2:Acc0}, ${1:List})
 endsnippet
 
 snippet foldr "lists:foldr"
 lists:foldr(fun(${3:Arg}, ${4:Acc}) ->
-    ${5:ok}
-end, ${2:Acc0}, ${1:List})
+                ${5:ok}
+            end, ${2:Acc0}, ${1:List})
 endsnippet
 
 snippet seq "lists:seq"
